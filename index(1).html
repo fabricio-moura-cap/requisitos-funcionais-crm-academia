@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Academia - Requisitos e Regras</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff1f1f;
+            --primary-glow: rgba(255, 31, 31, 0.5);
+            --bg: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: #b0b0b0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at 50% 50%, #1a0505 0%, #0a0a0a 100%);
+        }
+
+        /* Liquid Glass Background Effects */
+        .blobs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            filter: blur(80px);
+        }
+
+        .blob {
+            position: absolute;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.15;
+            animation: move 20s infinite alternate;
+        }
+
+        .blob-1 { width: 400px; height: 400px; top: -100px; left: -100px; }
+        .blob-2 { width: 300px; height: 300px; bottom: -50px; right: -50px; animation-delay: -5s; }
+
+        @keyframes move {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 100px) scale(1.2); }
+        }
+
+        header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 2.5rem;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .section-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .section-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .section-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1rem;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            padding: 10px 0;
+            z-index: 5;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 1.2rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px var(--primary-glow);
+            background: rgba(255, 31, 31, 0.05);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
+        }
+
+        .card:hover::before {
+            left: 100%;
+        }
+
+        .card-id {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+            letter-spacing: 0.5px;
+        }
+
+        .card-summary {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* Modal / Overlay Style */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(15px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 2rem;
+        }
+
+        .modal {
+            background: rgba(20, 20, 20, 0.8);
+            border: 1px solid var(--primary);
+            max-width: 700px;
+            width: 100%;
+            border-radius: 24px;
+            padding: 3rem;
+            position: relative;
+            box-shadow: 0 0 50px var(--primary-glow);
+            animation: modalIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.8) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--primary);
+            transform: rotate(90deg);
+        }
+
+        .modal-header {
+            margin-bottom: 2rem;
+        }
+
+        .modal-id {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            letter-spacing: 0.5px;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .info-group {
+            border-left: 3px solid var(--primary);
+            padding-left: 1.5rem;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .actor-tag {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        footer {
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        @media (max-width: 900px) {
+            main {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+            }
+            .section-container {
+                overflow-y: visible;
+            }
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <header>
+        <h1>CRM Academia - Gestão de Treinos</h1>
+    </header>
+
+    <main>
+        <div class="section-container">
+            <h2>Requisitos Funcionais</h2>
+            <div id="rf-list"></div>
+        </div>
+        <div class="section-container">
+            <h2>Regras de Negócio</h2>
+            <div id="rn-list"></div>
+        </div>
+    </main>
+
+    <div id="overlay">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <span id="modal-id" class="modal-id"></span>
+                <h3 id="modal-title" class="modal-title"></h3>
+            </div>
+            <div class="modal-body">
+                <div class="info-group">
+                    <span class="info-label">Descrição Completa</span>
+                    <p id="modal-full" class="info-value"></p>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">Ator Principal</span>
+                    <div id="modal-actor" class="actor-tag"></div>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">Relações de Sistema</span>
+                    <p id="modal-relations" class="info-value"></p>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">Explicação</span>
+                    <p id="modal-explanation" class="info-value"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Apresentação de Requisitos &copy; 2026 - CRM Academia Pro
+    </footer>
+
+    <script>
+        const data = {
+  "functional_requirements": [
+    {
+      "id": "RC01",
+      "summary": "Registro de Matrícula",
+      "full": "O sistema deve permitir registrar uma matrícula associando aluno, modalidade, plano, data de início, data de vencimento e status operacional.",
+      "actor": "Gerente",
+      "relations": "Aluno, Modalidade, Plano",
+      "explanation": "Funcionalidade base para entrada de novos alunos no sistema, garantindo o controle administrativo e financeiro inicial."
+    },
+    {
+      "id": "RC02",
+      "summary": "Bloqueio de Duplicidade",
+      "full": "O sistema deve impedir a criação de uma nova matrícula ativa para a mesma modalidade e unidade quando já existir matrícula ativa do mesmo aluno.",
+      "actor": "Sistema / Gerente",
+      "relations": "Matrícula, Aluno",
+      "explanation": "Evita erros operacionais e conflitos de cobrança ou agendamento para o mesmo serviço."
+    },
+    {
+      "id": "RC03",
+      "summary": "Suspensão e Reativação",
+      "full": "O sistema deve permitir suspender e reativar matrículas, registrando motivo, período de suspensão e usuário responsável pela operação.",
+      "actor": "Gerente",
+      "relations": "Histórico de Matrícula",
+      "explanation": "Gestão de afastamentos temporários (férias, saúde) mantendo a rastreabilidade das alterações."
+    },
+    {
+      "id": "RC04",
+      "summary": "Sinalização de Pendência",
+      "full": "O sistema deve sinalizar matrícula com pendência financeira após o prazo de tolerância configurado e aplicar as restrições de uso definidas pela academia.",
+      "actor": "Sistema",
+      "relations": "Módulo Financeiro, Controle de Acesso",
+      "explanation": "Automatiza o controle de inadimplência, bloqueando o acesso do aluno caso o pagamento não seja regularizado."
+    },
+    {
+      "id": "RC05",
+      "summary": "Cadastro de Treinos",
+      "full": "O sistema deve permitir ao instrutor cadastrar treinos contendo objetivo, ciclo de validade, divisões, exercícios, séries, repetições ou tempo, intervalo e observações.",
+      "actor": "Instrutor",
+      "relations": "Exercícios, Aluno",
+      "explanation": "Core técnico da aplicação, onde a prescrição do treinamento é digitalizada para o aluno."
+    },
+    {
+      "id": "RC06",
+      "summary": "Histórico de Versões",
+      "full": "O sistema deve manter o histórico de versões de treino, destacando de forma inequívoca qual treino ou ciclo está ativo para o aluno.",
+      "actor": "Sistema / Instrutor",
+      "relations": "Treinos Anteriores",
+      "explanation": "Permite acompanhar a evolução pedagógica do treino e garante que o aluno visualize apenas a ficha correta."
+    },
+    {
+      "id": "RC07",
+      "summary": "Acompanhamento do Aluno",
+      "full": "O sistema deve permitir o registro de acompanhamento do aluno, incluindo evolução, dores relatadas, restrições, observações de execução e necessidade de revisão.",
+      "actor": "Instrutor",
+      "relations": "Perfil do Aluno, CRM",
+      "explanation": "Ferramenta de retenção e segurança, registrando o feedback físico e técnico do cliente."
+    },
+    {
+      "id": "RC08",
+      "summary": "Consulta do Aluno",
+      "full": "O sistema deve disponibilizar ao aluno a consulta do treino ativo, da agenda de aulas e das informações essenciais da matrícula de forma simples e centralizada.",
+      "actor": "Aluno",
+      "relations": "App do Aluno",
+      "explanation": "Interface de autosserviço para o cliente final, aumentando o engajamento com a academia."
+    },
+    {
+      "id": "RC09",
+      "summary": "Histórico CRM",
+      "full": "O sistema deve registrar no histórico CRM os contatos e eventos relevantes da jornada do aluno, com data, responsável, categoria do registro e descrição resumida.",
+      "actor": "Gerente / Instrutor",
+      "relations": "Linha do Tempo do Aluno",
+      "explanation": "Centraliza todas as interações (vendas, suporte, feedbacks) para uma visão 360º do cliente."
+    },
+    {
+      "id": "RC10",
+      "summary": "Controle de Acesso",
+      "full": "O sistema deve restringir o acesso a informações sensíveis conforme o perfil do usuário, preservando privacidade e contexto de uso.",
+      "actor": "Sistema",
+      "relations": "Segurança / LGPD",
+      "explanation": "Garante que instrutores vejam dados técnicos e gerentes vejam dados financeiros/administrativos."
+    }
+  ],
+  "business_rules": [
+    {
+      "id": "RN01",
+      "summary": "Unicidade de Matrícula",
+      "full": "O aluno pode possuir mais de uma matrícula ativa desde que pertençam a modalidades distintas; para a mesma modalidade e unidade deve existir apenas uma matrícula ativa por vez.",
+      "actor": "Sistema",
+      "relations": "Validação de Cadastro",
+      "explanation": "Regra para evitar duplicidade de cobrança e confusão na agenda de uma mesma atividade."
+    },
+    {
+      "id": "RN02",
+      "summary": "Dados Obrigatórios",
+      "full": "Toda matrícula deve estar associada a um plano, modalidade, data de início, data de vencimento e status operacional (ativa, suspensa, encerrada ou pendente).",
+      "actor": "Sistema",
+      "relations": "Banco de Dados",
+      "explanation": "Garante a integridade mínima dos dados para relatórios e operações financeiras."
+    },
+    {
+      "id": "RN03",
+      "summary": "Histórico de Suspensão",
+      "full": "A suspensão de matrícula deve registrar motivo, data de início e data de término, mantendo o histórico preservado para futura reativação.",
+      "actor": "Gerente",
+      "relations": "Auditoria",
+      "explanation": "Permite entender o churn temporário e facilita a reativação sem perda de dados."
+    },
+    {
+      "id": "RN04",
+      "summary": "Bloqueio por Inadimplência",
+      "full": "Após o prazo de tolerância definido pela academia para inadimplência, o sistema deve sinalizar pendência e bloquear utilização vinculada à matrícula até regularização.",
+      "actor": "Sistema",
+      "relations": "Financeiro / Catraca",
+      "explanation": "Protege a receita da academia impedindo o uso do serviço sem o devido pagamento."
+    },
+    {
+      "id": "RN05",
+      "summary": "Limite de Ocupação",
+      "full": "Turmas e aulas devem possuir limite de ocupação para permitir controle de disponibilidade e evitar lotação não planejada.",
+      "actor": "Sistema / Gerente",
+      "relations": "Agenda / Turmas",
+      "explanation": "Garante a qualidade do atendimento e o cumprimento de normas de segurança."
+    },
+    {
+      "id": "RN06",
+      "summary": "Estrutura do Treino",
+      "full": "O treino deve conter objetivo, validade, divisões ou blocos, exercícios, séries, repetições ou tempo, intervalo e observações de execução.",
+      "actor": "Instrutor",
+      "relations": "Prescrição Técnica",
+      "explanation": "Padronização técnica necessária para a correta orientação do aluno."
+    },
+    {
+      "id": "RN07",
+      "summary": "Ciclo de Treino Vigente",
+      "full": "Um aluno pode possuir mais de uma divisão de treino ativa dentro de um mesmo ciclo, mas o sistema deve deixar explícito qual ciclo está vigente no período.",
+      "actor": "Sistema / Aluno",
+      "relations": "Visualização de Treino",
+      "explanation": "Organiza a progressão do treinamento (ex: Treino A, B, C) dentro de um planejamento macro."
+    },
+    {
+      "id": "RN08",
+      "summary": "Acesso ao Acompanhamento",
+      "full": "Registros de evolução, restrição física e observações técnicas devem compor o histórico de acompanhamento do aluno com acesso compatível ao perfil do usuário.",
+      "actor": "Sistema",
+      "relations": "Privacidade",
+      "explanation": "Dados de saúde são sensíveis e devem ser acessados apenas por quem tem competência técnica."
+    },
+    {
+      "id": "RN09",
+      "summary": "Rastreabilidade CRM",
+      "full": "O histórico de relacionamento deve registrar contatos, ocorrências, mudanças de plano, tentativas de retenção e eventos relevantes da jornada do aluno.",
+      "actor": "Sistema / Gerente",
+      "relations": "Módulo CRM",
+      "explanation": "Memória institucional sobre o cliente para facilitar negociações e atendimento personalizado."
+    },
+    {
+      "id": "RN10",
+      "summary": "Sigilo de Informações",
+      "full": "Informações sensíveis relacionadas à saúde ou a ocorrências específicas devem possuir acesso restrito conforme o perfil do usuário.",
+      "actor": "Sistema",
+      "relations": "LGPD / Segurança",
+      "explanation": "Conformidade legal e ética no tratamento de dados pessoais e sensíveis."
+    }
+  ]
+};
+
+        function createCard(item) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => openModal(item);
+            card.innerHTML = `
+                <span class="card-id">${item.id}</span>
+                <div class="card-summary">${item.summary}</div>
+            `;
+            return card;
+        }
+
+        function openModal(item) {
+            document.getElementById('modal-id').innerText = item.id;
+            document.getElementById('modal-title').innerText = item.summary;
+            document.getElementById('modal-full').innerText = item.full;
+            document.getElementById('modal-actor').innerText = item.actor;
+            document.getElementById('modal-relations').innerText = item.relations;
+            document.getElementById('modal-explanation').innerText = item.explanation;
+            
+            document.getElementById('overlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        // Close on overlay click
+        document.getElementById('overlay').onclick = function(e) {
+            if (e.target === this) closeModal();
+        }
+
+        // Populate lists
+        const rfList = document.getElementById('rf-list');
+        data.functional_requirements.forEach(item => {
+            rfList.appendChild(createCard(item));
+        });
+
+        const rnList = document.getElementById('rn-list');
+        data.business_rules.forEach(item => {
+            rnList.appendChild(createCard(item));
+        });
+    </script>
+</body>
+</html>
